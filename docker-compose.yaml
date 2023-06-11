@@ -1,0 +1,25 @@
+version: '3.9'
+
+services:
+  user-svc:
+    build:
+      context: .
+      target: development
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    volumes:
+      - "./:/app"
+      - /app/node_modules/
+    depends_on:
+      - db
+  db:
+    image: "postgres"
+    ports:
+      - "5432:5432"
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_USER=user
+      - POSTGRES_DB=users
