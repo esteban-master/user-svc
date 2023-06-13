@@ -2,13 +2,13 @@ import { Injectable, Inject } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy, StrategyOptions } from 'passport-jwt';
-import { AppService } from 'src/app.service';
 import commonEnv from 'src/config/CommonEnv.config';
+import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class AccessTokenStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(
-    private readonly appService: AppService,
+    private readonly userService: UserService,
     @Inject(commonEnv.KEY) commonEnvConfig: ConfigType<typeof commonEnv>,
   ) {
     const options: StrategyOptions = {
@@ -20,6 +20,6 @@ export class AccessTokenStrategy extends PassportStrategy(Strategy, 'jwt') {
   }
 
   async validate({ email }: any) {
-    return await this.appService.findUser(email);
+    return await this.userService.find({ email });
   }
 }

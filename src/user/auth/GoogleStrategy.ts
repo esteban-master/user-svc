@@ -2,14 +2,15 @@ import { Injectable, Inject } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Profile, Strategy, VerifyCallback } from 'passport-google-oauth20';
 import { AppService } from 'src/app.service';
-import authConfig from '../config/AuthEnv.config';
+import authConfig from '../../config/AuthEnv.config';
 import { ConfigType } from '@nestjs/config';
+import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy) {
   constructor(
     @Inject(authConfig.KEY) authEnvConfig: ConfigType<typeof authConfig>,
-    private readonly appService: AppService,
+    private readonly userService: UserService,
   ) {
     super({
       clientID: authEnvConfig.CLIENT_ID,
@@ -25,7 +26,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy) {
     profile: Profile,
     cb: VerifyCallback,
   ) {
-    const user = await this.appService.validateUser({
+    const user = await this.userService.validateUser({
       email: profile._json.email,
       name: profile._json.name,
     });

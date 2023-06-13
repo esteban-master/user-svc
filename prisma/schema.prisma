@@ -11,11 +11,18 @@ datasource db {
 }
 
 model User {
-  id      Int      @id @default(autoincrement())
-  email   String   @unique
-  name    String
-  age     Int?
-  phone   String?
+  id    Int     @id @default(autoincrement())
+  email String  @unique
+  name  String
+  age   Int?
+  phone String?
 
   refreshToken String?
+  student      Student?
+}
+
+model Student {
+  id     Int  @id @default(autoincrement())
+  user   User @relation(fields: [userId], references: [id])
+  userId Int  @unique
 }
