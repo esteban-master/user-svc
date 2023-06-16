@@ -24,7 +24,7 @@ export class StudentService {
     return createStudent;
   }
 
-  async find(where: Prisma.StudentWhereInput): Promise<Student> {
-    return await this.prisma.student.findFirst({ where });
+  async find(where: Prisma.StudentWhereUniqueInput): Promise<Student> {
+    return await this.prisma.student.findUnique({ where });
   }
 }
