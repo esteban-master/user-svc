@@ -2,12 +2,14 @@ import {
   Inject,
   Injectable,
   InternalServerErrorException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import commonEnv from 'src/config/CommonEnv.config';
 import { PrismaService } from '../config/database/prisma.service';
 import { Prisma } from '@prisma/client';
+// import { PubSubService } from 'src/pub-sub.service';
 
 @Injectable()
 export class UserService {
@@ -15,7 +17,7 @@ export class UserService {
     private readonly prisma: PrismaService,
     private readonly jwt: JwtService,
     @Inject(commonEnv.KEY)
-    private readonly commonEnvConfig: ConfigType<typeof commonEnv>,
+    private readonly commonEnvConfig: ConfigType<typeof commonEnv>, // private readonly pubSubService: PubSubService,
   ) {}
 
   async validateUser({ email, name }: { email: string; name: string }) {
@@ -44,7 +46,7 @@ export class UserService {
     const [accessToken, refreshToken] = await Promise.all([
       this.jwt.signAsync(
         { email, id },
-        { secret: this.commonEnvConfig.JWT_ACCESS_SECRET, expiresIn: '1h' },
+        { secret: this.commonEnvConfig.JWT_ACCESS_SECRET, expiresIn: '5h' },
       ),
       this.jwt.signAsync(
         { email, id },
@@ -90,5 +92,39 @@ export class UserService {
 
   async find(where: Prisma.UserWhereUniqueInput) {
     return await this.prisma.user.findUnique({ where });
+  }
+
+  async logout(userId: number) {
+    await this.prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        refreshToken: null,
+      },
+    });
+  }
+
+  async refreshTokens(userId: number) {
+    const findUser = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+    if (findUser) {
+      const [accessToken, refreshToken] = await this.createTokens({
+        email: findUser.email,
+        id: findUser.id,
+      });
+
+      await this.updateRefreshToken({
+        userId: findUser.id,
+        refreshToken,
+      });
+      return {
+        accessToken,
+        refreshToken,
+      };
+    }
+
+    throw new ForbiddenException();
   }
 }

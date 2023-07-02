@@ -9,9 +9,9 @@ import commonEnv from './config/CommonEnv.config';
 import { ConfigType } from '@nestjs/config';
 
 @Injectable()
-export class PubSubService implements OnModuleInit, OnModuleDestroy {
+export class PubSubService implements OnModuleDestroy {
   protected readonly client: PubSub;
-  protected readonly subscription: Subscription;
+  // protected readonly subscription: Subscription;
   protected readonly topic: Topic;
 
   constructor(
@@ -21,21 +21,21 @@ export class PubSubService implements OnModuleInit, OnModuleDestroy {
       projectId: commonEnvConfig.PROJECT_ID,
     });
     this.topic = this.client.topic(commonEnvConfig.PUB_SUB_TOPIC_ID);
-    this.subscription = this.topic.subscription(
-      commonEnvConfig.PUB_SUB_SUBSCRIPTION_ID,
-    );
+    // this.subscription = this.topic.subscription(
+    //   commonEnvConfig.PUB_SUB_SUBSCRIPTION_ID,
+    // );
   }
 
-  onModuleInit() {
-    this.subscription
-      .on('message', (message: Message) => {
-        console.log('MESAJE DATA: ', JSON.parse(message.data.toString()));
-        message.ack();
-      })
-      .on('error', (error) => {
-        console.error(error);
-      });
-  }
+  // onModuleInit() {
+  //   this.subscription
+  //     .on('message', (message: Message) => {
+  //       console.log('MESAJE DATA: ', JSON.parse(message.data.toString()));
+  //       message.ack();
+  //     })
+  //     .on('error', (error) => {
+  //       console.error(error);
+  //     });
+  // }
 
   async publicMessage(data: any) {
     const dataBuffer = Buffer.from(JSON.stringify(data));
@@ -48,7 +48,7 @@ export class PubSubService implements OnModuleInit, OnModuleDestroy {
   }
 
   async onModuleDestroy() {
-    await this.subscription.close();
+    // await this.subscription.close();
     await this.client.close();
   }
 }

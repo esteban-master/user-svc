@@ -5,7 +5,6 @@ import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
 import authEnvConfig from './config/AuthEnv.config';
 import commonEnvConfig from './config/CommonEnv.config';
-import { PubSubService } from './pub-sub.service';
 import { StudentModule } from './student/student.module';
 import { UserModule } from './user/user.module';
 @Module({
@@ -26,6 +25,6 @@ import { UserModule } from './user/user.module';
     StudentModule,
   ],
   controllers: [AppController],
-  providers: [AppService, PubSubService],
+  providers: [AppService],
 })
 export class AppModule {}

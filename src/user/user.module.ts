@@ -6,6 +6,7 @@ import { AccessTokenStrategy } from 'src/user/auth/AccessTokenStrategy';
 import { RefreshTokenStrategy } from 'src/user/auth/RefreshTokenStrategy';
 import { UserController } from './user.controller';
 import { DatabaseModule } from 'src/config/database/database.module';
+// import { PubSubService } from 'src/pub-sub.service';
 
 @Module({
   imports: [JwtModule.register({}), DatabaseModule],
@@ -15,6 +16,7 @@ import { DatabaseModule } from 'src/config/database/database.module';
     GoogleStrategy,
     AccessTokenStrategy,
     RefreshTokenStrategy,
+    // PubSubService,
   ],
   exports: [UserService],
 })
